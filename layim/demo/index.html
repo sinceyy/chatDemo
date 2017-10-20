@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>LayIM移动版测试</title>
+    <link rel="stylesheet" href="//res.layui.com/layui/dist/css/layui.css?t=1508154136729"  media="all">
+  </head>
+  <body>
+    <script src="//res.layui.com/layui/dist/layui.js?t=1508154136729" charset="utf-8"></script>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+    <script>
+      var username = ''
+      var namespace = '/im';
+      var socket = io.connect('http://192.168.124.139:5002' + namespace);
+      var randomUser =[
+          {
+              "username": "贤心",
+              "id": "100001",
+              "avatar": "http://tp1.sinaimg.cn/1571889140/180/40030060651/1",
+              "sign": "这些都是测试数据，实际使用请严格按照该格式返回"
+          },
+          {
+              "username": "Z_子晴",
+              "id": "108101",
+              "avatar": "http://tva3.sinaimg.cn/crop.0.0.512.512.180/8693225ajw8f2rt20ptykj20e80e8weu.jpg",
+              "sign": "微电商达人"
+          },
+          {
+              "username": "Lemon_CC",
+              "id": "102101",
+              "avatar": "http://tp2.sinaimg.cn/1833062053/180/5643591594/0",
+              "sign": ""
+          },
+          {
+              "username": "马小云",
+              "id": "168168",
+              "avatar": "http://tp4.sinaimg.cn/2145291155/180/5601307179/1",
+              "sign": "让天下没有难写的代码"
+          },
+          {
+              "username": "徐小峥",
+              "id": "666666",
+              "avatar": "http://tp2.sinaimg.cn/1783286485/180/5677568891/1",
+              "sign": "代码在囧途，也要写到底"
+          },
+          {
+              "username": "罗玉凤",
+              "id": "121286",
+              "avatar": "http://tp1.sinaimg.cn/1241679004/180/5743814375/0",
+              "sign": "在自己实力不济的时候，不要去相信什么媒体和记者。他们不是善良的人，有时候候他们的采访对当事人而言就是陷阱"
+          },
+          {
+              "username": "长泽梓Azusa",
+              "id": "100001222",
+              "avatar": "http://tva1.sinaimg.cn/crop.0.0.180.180.180/86b15b6cjw1e8qgp5bmzyj2050050aa8.jpg",
+              "sign": "我是日本女艺人长泽あずさ"
+          },
+          {
+              "username": "大鱼_MsYuyu",
+              "id": "12123454",
+              "avatar": "http://tp1.sinaimg.cn/5286730964/50/5745125631/0",
+              "sign": "我瘋了！這也太準了吧  超級笑點低"
+          },
+          {
+              "username": "谢楠",
+              "id": "10034001",
+              "avatar": "http://tp4.sinaimg.cn/1665074831/180/5617130952/0",
+              "sign": ""
+          },
+          {
+              "username": "柏雪近在它香",
+              "id": "3435343",
+              "avatar": "http://tp2.sinaimg.cn/2518326245/180/5636099025/0",
+              "sign": ""
+          },
+          {
+              "username": "林心如",
+              "id": "76543",
+              "avatar": "http://tp3.sinaimg.cn/1223762662/180/5741707953/0",
+              "sign": "我爱贤心"
+          },
+          {
+              "username": "佟丽娅",
+              "id": "4803920",
+              "avatar": "http://tp4.sinaimg.cn/1345566427/180/5730976522/0",
+              "sign": "我也爱贤心吖吖啊"
+          }]
+      var avatar = randomUser[Math.floor(Math.random()*12)].avatar
+      layui.use('layer', function(){
+        layer.open({
+          title: '填写昵称才能发言',
+          type: 1,
+          content: $('#email-from')
+        });
+      });
+      layui.use('form', function(){
+        var form = layui.form;
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+          username = JSON.stringify(data.field.title)
+          layer.close(layer.index);
+          layui.use('mobile', function(){
+            var mobile = layui.mobile;
+            var layim = mobile.layim; 
+            //基础配置
+            layim.config({
+              init: {
+                //设置我的基础信息
+                mine: {
+                  "username": username, //我的昵称
+                  "id": Date.parse(new Date())/1000, //我的ID
+                  "avatar": avatar //我的头像
+                }
+              }
+            });
+            //创建一个会话
+            layim.chat({
+              id: 111111,
+              name: '群聊',
+              type: 'friend', //friend、group等字符，如果是group，则创建的是群聊
+              avatar: 'http://tp1.sinaimg.cn/1571889140/180/40030060651/1'
+            });
+            //监听发送消息
+            layim.on('sendMessage', function(res){
+              var mine = res.mine; //包含我发送的消息及我的信息
+              //监听到上述消息后，就可以轻松地发送socket了
+              var toMsg = {
+                username: username, //消息来源用户名
+                avatar: avatar, //消息来源用户头像
+                id: 111111, //聊天窗口来源ID（如果是私聊，则是用户id，如果是群聊，则是群组id）
+                type: "friend", //聊天窗口来源类型，从发送消息传递的to里面获取
+                content: mine.content,//消息内容
+                mine: false, //是否我发送的消息，如果为true，则会显示在右方
+                timestamp: Date.parse(new Date())/1000 //服务端动态时间戳 
+              };
+              socket.emit('my_broadcast_event', {data: toMsg});
+            });
+            socket.on('my_response', function(msg) {
+              if(msg.data.username != username){
+                layim.getMessage(msg.data);
+              }
+            });
+          });
+          return false
+        });
+      });
+    </script>
+  </body>
+
+  <form id="email-from" class="layui-form" action="">
+    <div class="layui-form-item">
+      <label class="layui-form-label">昵称</label>
+      <div class="layui-input-block">
+        <input type="text" name="title" required  lay-verify="required" placeholder="请输入昵称" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+      </div>
+    </div>
+  </form>
+
+</html>
