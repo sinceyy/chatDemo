@@ -13,9 +13,8 @@
                root   /home/data/code/;
                autoindex on;
            }
-       }
-    
-自行更改host访问
+       }
+也可不部署直接在浏览器打开index.html文件
 
 lim启动方式
 gunicorn --worker-class eventlet -w 1 app:app -b 0.0.0.0:5002
