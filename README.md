@@ -1,18 +1,18 @@
 # chatDemo
 静态页面部署方式
- server {
-        listen       80;
-        server_name  layui.com;
-        location / {
-            root   /home/data/code/;
-            index  index.html index.htm;
-        }
-        location /layui/ {
-            root   /home/data/code/;
-            autoindex on;
-        }
 
-    }
+    server {
+           listen       80;
+           server_name  layui.com;
+           location / {
+               root   /home/data/code/;
+               index  index.html index.htm;
+           }
+           location /layui/ {
+               root   /home/data/code/;
+               autoindex on;
+           }
+       }
     
 自行更改host访问
 
