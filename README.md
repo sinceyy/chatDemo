@@ -14,6 +14,8 @@
                autoindex on;
            }
        }
+       
+       
 也可不部署直接在浏览器打开index.html文件
 
 lim启动方式
