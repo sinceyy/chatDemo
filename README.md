@@ -1,4 +1,5 @@
 # chatDemo
+![Alt text](chat.gif)
 静态页面部署方式
 
     server {
